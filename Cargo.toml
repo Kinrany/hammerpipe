@@ -5,3 +5,4 @@ authors = ["Kinrany <kinrany@yandex.com>"]
 edition = "2018"
 
 [dependencies]
+quicksilver = "0.3.7"

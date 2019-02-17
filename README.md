@@ -1,5 +1,9 @@
 # Hammerpipe
 
+## Play
+
+https://kinrany.github.io/hammerpipe/
+
 ## The idea
 
 [Pipe Mania][pipe-mania], but hitting the pipes with a hammer

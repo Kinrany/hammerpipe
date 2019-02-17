@@ -4,5 +4,6 @@ version = "0.1.0"
 authors = ["Kinrany <kinrany@yandex.com>"]
 edition = "2018"
 
-[dependencies]
-quicksilver = "0.3.7"
+[dependencies.quicksilver]
+version = "0.3.7"
+default-features = false

@@ -20,6 +20,12 @@ impl Field {
   pub fn rect(w: &Window) -> Rectangle {
     Rectangle::new(Field::pos(w), Field::size(w))
   }
+
+  pub fn draw_background(w: &mut Window) {
+    let color = Color {r: 0.5, g: 0.8, b: 0.5, a: 1.0};
+    let background = Background::Col(color);
+    w.draw(&Field::rect(w), background);
+  }
 }
 
 pub const CELL_COUNT: u32 = 6;
@@ -48,12 +54,6 @@ impl Cell {
   pub fn rect(&self, w: &Window) -> Rectangle {
     Rectangle::new(self.pos(w), Cell::size(w))
   }
-}
-
-pub fn draw_background(w: &mut Window) {
-  let color = Color {r: 0.5, g: 0.8, b: 0.5, a: 1.0};
-  let background = Background::Col(color);
-  w.draw(&Field::rect(w), background);
 }
 
 pub fn draw_cells(w: &mut Window) {
@@ -89,7 +89,7 @@ impl State for Game {
       Background::Col(Color::BLACK),
     );
 
-    draw_background(window);
+    Field::draw_background(window);
     draw_cells(window);
 
     Ok(())

@@ -1,5 +1,5 @@
 use quicksilver::{
-  geom::{Rectangle, Vector},
+  geom::{Line, Rectangle, Vector},
   graphics::{Background, Color},
   lifecycle::{State, Window},
   Result,
@@ -28,13 +28,13 @@ impl Field {
   }
 }
 
-pub const CELL_COUNT: u32 = 6;
-pub const SPACE_BETWEEN_CELLS: f32 = 0.3;
-pub const GRID_WIDTH_IN_CELLS: f32 = CELL_COUNT as f32 + SPACE_BETWEEN_CELLS * (CELL_COUNT - 1) as f32;
+const CELL_COUNT: usize = 6;
+const SPACE_BETWEEN_CELLS: f32 = 0.15;
+const GRID_WIDTH_IN_CELLS: f32 = CELL_COUNT as f32 + SPACE_BETWEEN_CELLS * (CELL_COUNT - 1) as f32;
 
-pub struct Cell {
-  pub x: u32,
-  pub y: u32,
+struct Cell {
+  pub x: usize,
+  pub y: usize,
 }
 
 impl Cell {
@@ -56,24 +56,77 @@ impl Cell {
   }
 }
 
-pub fn draw_cells(w: &mut Window) {
+fn draw_cell_background(w: &mut Window, cell: &Cell) {
   let cell_color = Color {r: 0.25, g: 0.4, b: 0.5, a: 1.0};
   let background = Background::Col(cell_color);
+  w.draw(&cell.rect(w), background);
+}
 
+fn draw_cells(w: &mut Window) {
   for x in 0..CELL_COUNT {
     for y in 0..CELL_COUNT {
       let cell = Cell {x, y};
-      w.draw(&cell.rect(w), background);
+      draw_cell_background(w, &cell);
     }
   };
 }
 
-pub struct Game;
+#[derive(Clone, Copy)]
+enum Pipe {
+  Horizontal,
+  Vertical,
+}
+
+type PipeGrid = [[Pipe; CELL_COUNT]; CELL_COUNT];
+
+fn rotate(pipe: &Pipe) -> Pipe {
+  match pipe {
+    Pipe::Horizontal => Pipe::Vertical,
+    Pipe::Vertical => Pipe::Horizontal,
+  }
+}
+
+fn draw_pipe(w: &mut Window, pipe: &Pipe, cell: &Cell) {
+  let line = match pipe {
+    Pipe::Horizontal => {
+      let cell_top = cell.pos(w) + Vector::X * Cell::size(w).x / 2;
+      let cell_bottom = cell_top + Vector::Y * Cell::size(w).y;
+      Line::new(cell_top, cell_bottom)
+    },
+    Pipe::Vertical => {
+      let cell_left = cell.pos(w) + Vector::Y * Cell::size(w).y / 2;
+      let cell_right = cell_left + Vector::X * Cell::size(w).x;
+      Line::new(cell_left, cell_right)
+    }
+  }.with_thickness(12.0);
+  w.draw(&line, Background::Col(Color::BLUE));
+}
+
+fn draw_pipes(w: &mut Window, pipes: PipeGrid) {
+  for x in 0..CELL_COUNT {
+    for y in 0..CELL_COUNT {
+      let cell = Cell {x, y};
+      draw_pipe(w, &pipes[x][y], &cell);
+    }
+  };
+}
+
+pub struct Game {
+  pipes: PipeGrid,
+}
+
+impl Game {
+  pub fn new() -> Game {
+    Game {
+      pipes: [[Pipe::Vertical; CELL_COUNT]; CELL_COUNT],
+    }
+  }
+}
 
 impl State for Game {
   /// Load the assets and initialise the game
   fn new() -> Result<Self> {
-    Ok(Self)
+    Ok(Game::new())
   }
 
   /// Process keyboard and mouse, update the game state
@@ -91,6 +144,7 @@ impl State for Game {
 
     Field::draw_background(window);
     draw_cells(window);
+    draw_pipes(window, self.pipes);
 
     Ok(())
   }

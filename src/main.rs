@@ -11,5 +11,5 @@ fn main() {
     scale: quicksilver::graphics::ImageScaleStrategy::Blur,
     ..Default::default()
   };
-  run::<game::Game>("Quicksilver Roguelike", Vector::new(800, 600), settings);
+  run::<game::Game>("Hammerpipe", Vector::new(800, 600), settings);
 }

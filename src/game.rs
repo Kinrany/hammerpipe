@@ -1,6 +1,7 @@
 use quicksilver::{
-  geom::{Line, Rectangle, Vector},
+  geom::{Line, Rectangle, Shape, Vector},
   graphics::{Background, Color},
+  input::{MouseButton, ButtonState},
   lifecycle::{State, Window},
   Result,
 };
@@ -130,7 +131,25 @@ impl State for Game {
   }
 
   /// Process keyboard and mouse, update the game state
-  fn update(&mut self, _window: &mut Window) -> Result<()> {
+  fn update(&mut self, window: &mut Window) -> Result<()> {
+    let mouse = window.mouse();
+
+    let clicked = mouse[MouseButton::Left] == ButtonState::Pressed;
+    if !clicked {
+      return Ok(());
+    }
+
+    let pos = mouse.pos();
+
+    for x in 0..CELL_COUNT {
+      for y in 0..CELL_COUNT {
+        let cell = Cell {x, y};
+        if cell.rect(window).contains(pos) {
+          self.pipes[x][y] = rotate(&self.pipes[x][y]);
+        }
+      }
+    };
+
     Ok(())
   }
 

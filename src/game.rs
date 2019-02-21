@@ -6,6 +6,14 @@ use quicksilver::{
   Result,
 };
 
+trait ColorExt {
+  const GREY: Color;
+}
+
+impl ColorExt for Color {
+  const GREY: Color = Color {r: 0.5, g: 0.5, b: 0.5, a: 1.0};
+}
+
 struct Field;
 
 impl Field {
@@ -23,14 +31,14 @@ impl Field {
   }
 
   pub fn draw_background(w: &mut Window) {
-    let color = Color {r: 0.5, g: 0.8, b: 0.5, a: 1.0};
+    let color = Color {r: 0.5, g: 0.5, b: 0.8, a: 1.0};
     let background = Background::Col(color);
     w.draw(&Field::rect(w), background);
   }
 }
 
 const CELL_COUNT: usize = 6;
-const SPACE_BETWEEN_CELLS: f32 = 0.15;
+const SPACE_BETWEEN_CELLS: f32 = 0.10;
 const GRID_WIDTH_IN_CELLS: f32 = CELL_COUNT as f32 + SPACE_BETWEEN_CELLS * (CELL_COUNT - 1) as f32;
 
 struct Cell {
@@ -58,7 +66,7 @@ impl Cell {
 }
 
 fn draw_cell_background(w: &mut Window, cell: &Cell) {
-  let cell_color = Color {r: 0.25, g: 0.4, b: 0.5, a: 1.0};
+  let cell_color = Color::GREY;
   let background = Background::Col(cell_color);
   w.draw(&cell.rect(w), background);
 }
@@ -99,8 +107,8 @@ fn draw_pipe(w: &mut Window, pipe: &Pipe, cell: &Cell) {
       let cell_right = cell_left + Vector::X * Cell::size(w).x;
       Line::new(cell_left, cell_right)
     }
-  }.with_thickness(12.0);
-  w.draw(&line, Background::Col(Color::BLUE));
+  }.with_thickness(30.0);
+  w.draw(&line, Background::Col(Color::WHITE.with_alpha(0.5).multiply(Color::GREEN)));
 }
 
 fn draw_pipes(w: &mut Window, pipes: PipeGrid) {

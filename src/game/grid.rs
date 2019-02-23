@@ -40,19 +40,19 @@ impl Cell {
   pub fn rect(&self, w: &Window) -> Rectangle {
     Rectangle::new(self.pos(w), Cell::size(w))
   }
-}
 
-fn draw_cell_background(w: &mut Window, cell: &Cell) {
-  let cell_color = Color::GREY;
-  let background = Background::Col(cell_color);
-  w.draw(&cell.rect(w), background);
+  pub fn draw_background(&self, w: &mut Window) {
+    let cell_color = Color::GREY;
+    let background = Background::Col(cell_color);
+    w.draw(&self.rect(w), background);
+  }
 }
 
 pub fn draw_cells(w: &mut Window) {
   for x in 0..CELL_COUNT {
     for y in 0..CELL_COUNT {
       let cell = Cell {x, y};
-      draw_cell_background(w, &cell);
+      cell.draw_background(w);
     }
   };
 }

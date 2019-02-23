@@ -13,7 +13,7 @@ mod pipe;
 use {
   grid::{Cell, CELL_COUNT, draw_cells},
   field::Field,
-  pipe::{Pipe, draw_pipe, rotate},
+  pipe::Pipe,
 };
 
 type PipeGrid = [[Pipe; CELL_COUNT]; CELL_COUNT];
@@ -22,7 +22,7 @@ fn draw_pipes(w: &mut Window, pipes: PipeGrid) {
   for x in 0..CELL_COUNT {
     for y in 0..CELL_COUNT {
       let cell = Cell {x, y};
-      draw_pipe(w, &pipes[x][y], &cell);
+      pipes[x][y].draw(w, &cell);
     }
   };
 }
@@ -60,7 +60,7 @@ impl State for Game {
       for y in 0..CELL_COUNT {
         let cell = Cell {x, y};
         if cell.rect(window).contains(pos) {
-          self.pipes[x][y] = rotate(&self.pipes[x][y]);
+          self.pipes[x][y].rotate();
         }
       }
     };

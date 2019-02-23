@@ -25,4 +25,8 @@ impl Field {
     let background = Background::Col(color);
     w.draw(&Field::rect(w), background);
   }
+
+  pub fn screen_pos(w: &Window, pos: Vector) -> Vector {
+    return Field::pos(w) + Field::size(w).times(pos);
+  }
 }

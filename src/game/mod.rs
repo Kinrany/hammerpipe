@@ -1,7 +1,7 @@
 use quicksilver::{
-  geom::{Rectangle, Shape},
+  geom::{Rectangle, Shape, Vector},
   graphics::{Background, Color},
-  input::{MouseButton, ButtonState},
+  input::{ButtonState, MouseButton},
   lifecycle::{State, Window},
   Result,
 };
@@ -9,11 +9,13 @@ use quicksilver::{
 mod grid;
 mod field;
 mod pipe;
+mod player;
 
 use {
   grid::{Cell, CELL_COUNT, draw_cells},
   field::Field,
   pipe::Pipe,
+  player::Player,
 };
 
 type PipeGrid = [[Pipe; CELL_COUNT]; CELL_COUNT];
@@ -29,13 +31,26 @@ fn draw_pipes(w: &mut Window, pipes: PipeGrid) {
 
 pub struct Game {
   pipes: PipeGrid,
+  player: Player,
 }
 
 impl Game {
   pub fn new() -> Game {
     Game {
       pipes: [[Pipe::Vertical; CELL_COUNT]; CELL_COUNT],
+      player: Player::new(),
     }
+  }
+
+  pub fn rotate_pipe_at(&mut self, pos: Vector, w: &Window) {
+    for x in 0..CELL_COUNT {
+      for y in 0..CELL_COUNT {
+        let cell = Cell {x, y};
+        if cell.rect(w).contains(pos) {
+          self.pipes[x][y].rotate();
+        }
+      }
+    };
   }
 }
 
@@ -49,21 +64,11 @@ impl State for Game {
   fn update(&mut self, window: &mut Window) -> Result<()> {
     let mouse = window.mouse();
 
-    let clicked = mouse[MouseButton::Left] == ButtonState::Pressed;
-    if !clicked {
-      return Ok(());
+    if mouse[MouseButton::Left] == ButtonState::Pressed {
+      self.rotate_pipe_at(mouse.pos(), window);
     }
 
-    let pos = mouse.pos();
-
-    for x in 0..CELL_COUNT {
-      for y in 0..CELL_COUNT {
-        let cell = Cell {x, y};
-        if cell.rect(window).contains(pos) {
-          self.pipes[x][y].rotate();
-        }
-      }
-    };
+    self.player.update(window);
 
     Ok(())
   }
@@ -79,6 +84,7 @@ impl State for Game {
     Field::draw_background(window);
     draw_cells(window);
     draw_pipes(window, self.pipes);
+    self.player.draw(window);
 
     Ok(())
   }

@@ -1,10 +1,24 @@
 use quicksilver::{
-  geom::{Line, Vector},
-  graphics::{Background, Color},
-  lifecycle::Window,
+  geom::Shape,
+  graphics::{Background, Image},
+  lifecycle::{Asset, Window},
 };
 
 use super::grid::Cell;
+
+pub struct PipeAssets {
+  pub horizontal: Asset<Image>,
+  pub vertical: Asset<Image>,
+}
+
+impl PipeAssets {
+  pub fn new() -> PipeAssets {
+    PipeAssets {
+      horizontal: Asset::new(Image::load("Kenney puzzle pack/Pipes/Green/pipeGreen_04.png")),
+      vertical: Asset::new(Image::load("Kenney puzzle pack/Pipes/Green/pipeGreen_03.png")),
+    }
+  }
+}
 
 #[derive(Clone, Copy)]
 pub enum Pipe {
@@ -13,20 +27,17 @@ pub enum Pipe {
 }
 
 impl Pipe {
-  pub fn draw(&self, w: &mut Window, cell: &Cell) {
-    let line = match self {
-      Pipe::Horizontal => {
-        let cell_top = cell.pos(w) + Vector::X * Cell::size(w).x / 2;
-        let cell_bottom = cell_top + Vector::Y * Cell::size(w).y;
-        Line::new(cell_top, cell_bottom)
-      },
-      Pipe::Vertical => {
-        let cell_left = cell.pos(w) + Vector::Y * Cell::size(w).y / 2;
-        let cell_right = cell_left + Vector::X * Cell::size(w).x;
-        Line::new(cell_left, cell_right)
-      }
-    }.with_thickness(30.0);
-    w.draw(&line, Background::Col(Color::WHITE.with_alpha(0.5).multiply(Color::GREEN)));
+  pub fn draw(&self, w: &mut Window, cell: &Cell, assets: &mut PipeAssets) {
+    let asset = match self {
+      Pipe::Horizontal => &mut assets.horizontal,
+      Pipe::Vertical => &mut assets.vertical,
+    };
+
+    // TODO: why does `execute` return a result?
+    let _ = asset.execute(|image| {
+      w.draw(&cell.rect(w), Background::Img(image));
+      Ok(())
+    });
   }
 
   pub fn rotate(&mut self) {

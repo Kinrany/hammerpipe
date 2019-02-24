@@ -14,28 +14,30 @@ mod player;
 use {
   grid::{Cell, CELL_COUNT, draw_cells},
   field::Field,
-  pipe::Pipe,
+  pipe::{Pipe, PipeAssets},
   player::Player,
 };
 
 struct Pipes {
   grid: [[Pipe; CELL_COUNT]; CELL_COUNT],
+  assets: PipeAssets,
 }
 
 impl Pipes {
   fn new() -> Pipes {
     Pipes {
-      grid: [[Pipe::Vertical; CELL_COUNT]; CELL_COUNT]
+      grid: [[Pipe::Vertical; CELL_COUNT]; CELL_COUNT],
+      assets: PipeAssets::new(),
     }
   }
 
-  fn draw(&self, w: &mut Window) {
+  fn draw(&mut self, w: &mut Window) {
     for x in 0..CELL_COUNT {
       for y in 0..CELL_COUNT {
         let cell = Cell {x, y};
-        self.grid[x][y].draw(w, &cell);
+        self.grid[x][y].draw(w, &cell, &mut self.assets);
       }
-    };
+    }
   }
 }
 

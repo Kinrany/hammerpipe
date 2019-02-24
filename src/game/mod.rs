@@ -18,26 +18,36 @@ use {
   player::Player,
 };
 
-type PipeGrid = [[Pipe; CELL_COUNT]; CELL_COUNT];
+struct Pipes {
+  grid: [[Pipe; CELL_COUNT]; CELL_COUNT],
+}
 
-fn draw_pipes(w: &mut Window, pipes: PipeGrid) {
-  for x in 0..CELL_COUNT {
-    for y in 0..CELL_COUNT {
-      let cell = Cell {x, y};
-      pipes[x][y].draw(w, &cell);
+impl Pipes {
+  fn new() -> Pipes {
+    Pipes {
+      grid: [[Pipe::Vertical; CELL_COUNT]; CELL_COUNT]
     }
-  };
+  }
+
+  fn draw(&self, w: &mut Window) {
+    for x in 0..CELL_COUNT {
+      for y in 0..CELL_COUNT {
+        let cell = Cell {x, y};
+        self.grid[x][y].draw(w, &cell);
+      }
+    };
+  }
 }
 
 pub struct Game {
-  pipes: PipeGrid,
+  pipes: Pipes,
   player: Player,
 }
 
 impl Game {
   pub fn new() -> Game {
     Game {
-      pipes: [[Pipe::Vertical; CELL_COUNT]; CELL_COUNT],
+      pipes: Pipes::new(),
       player: Player::new(),
     }
   }
@@ -47,7 +57,7 @@ impl Game {
       for y in 0..CELL_COUNT {
         let cell = Cell {x, y};
         if cell.rect(w).contains(pos) {
-          self.pipes[x][y].rotate();
+          self.pipes.grid[x][y].rotate();
         }
       }
     };
@@ -83,7 +93,7 @@ impl State for Game {
 
     Field::draw_background(window);
     draw_cells(window);
-    draw_pipes(window, self.pipes);
+    self.pipes.draw(window);
     self.player.draw(window);
 
     Ok(())
